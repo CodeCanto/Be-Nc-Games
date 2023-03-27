@@ -35,7 +35,6 @@ describe("GET /api/categories", () => {
       .get("/api/categories")
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
         const { categoryObj } = body;
         categoryObj.forEach((categoryObj) => {
           expect(categoryObj).toMatchObject({
