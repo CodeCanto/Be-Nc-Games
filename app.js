@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
 const { getCategories } = require("./controllers/categoriesController");
-const db = require("./db/connection");
+const { getReview } = require("./controllers/reviewsController");
+const {
+  handleCustomError,
+  handlePSQLError,
+  handleInternalError,
+} = require("./controllers/errorHandlerControllers");
 
 app.use(express.json());
 
@@ -11,17 +16,14 @@ app.get("/api", (req, res) => {
 
 app.get("/api/categories", getCategories);
 
-app.get("/api/reviews/:review_id", (req, res) => {
-  const reviewId = req.params.review_id;
-  return db.query(
-    `SELECT * FROM reviews WHERE review_id = ${reviewId}`,
-    (err, results) => {
-      if (err) {
-        throw err;
-      }
-      res.status(200).send({ reviewObj: results.rows[0] });
-    }
-  );
+app.get("/api/reviews/:review_id", getReview);
+
+app.use(handleCustomError);
+app.use(handlePSQLError);
+app.use(handleInternalError);
+
+app.all("/*", (req, res) => {
+  res.status(404).send({ msg: "Path not found." });
 });
 
 module.exports = app;

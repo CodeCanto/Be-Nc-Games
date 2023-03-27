@@ -17,6 +17,17 @@ afterAll(() => {
   return db.end();
 });
 
+describe("Non existant endpoints.", () => {
+  it("404: Returns an error if trying to access a nonexistant endpoint.", () => {
+    return request(app)
+      .get("/not-an-endpoint")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Path not found.");
+      });
+  });
+});
+
 describe("GET /api", () => {
   it("200: returns, Server online.", () => {
     return request(app)
@@ -45,7 +56,7 @@ describe("GET /api/categories", () => {
   });
 });
 
-describe("GET /api/reviews:review_id", () => {
+describe("GET /api/reviews/:review_id", () => {
   it("200: Returns a review object with the correct properties.", () => {
     return request(app)
       .get("/api/reviews/1")
@@ -53,16 +64,25 @@ describe("GET /api/reviews:review_id", () => {
       .then(({ body }) => {
         const { reviewObj } = body;
         expect(reviewObj).toMatchObject({
-          review_id: expect.any(Number),
-          title: expect.any(String),
-          review_body: expect.any(String),
-          designer: expect.any(String),
-          review_img_url: expect.any(String),
-          votes: expect.any(Number),
-          category: expect.any(String),
-          owner: expect.any(String),
-          created_at: expect.any(String),
+          review_id: 1,
+          title: "Agricola",
+          review_body: "Farmyard fun!",
+          designer: "Uwe Rosenberg",
+          review_img_url:
+            "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+          votes: 1,
+          category: "euro game",
+          owner: "mallionaire",
+          created_at: "2021-01-18T10:00:20.514Z",
         });
+      });
+  });
+  it("400: should return bad request when endpoint has an id which does not exist.", () => {
+    return request(app)
+      .get("/api/reviews/:monkey")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
       });
   });
 });
