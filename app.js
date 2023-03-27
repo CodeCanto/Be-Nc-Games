@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const { getCategories } = require("./controllers/categoriesController");
+const db = require("./db/connection");
 
 app.use(express.json());
 
@@ -10,8 +11,17 @@ app.get("/api", (req, res) => {
 
 app.get("/api/categories", getCategories);
 
-const server = app.listen("9090", () => {
-  console.log("Server is listening on port 9090");
+app.get("/api/reviews/:review_id", (req, res) => {
+  const reviewId = req.params.review_id;
+  return db.query(
+    `SELECT * FROM reviews WHERE review_id = ${reviewId}`,
+    (err, results) => {
+      if (err) {
+        throw err;
+      }
+      res.status(200).send({ reviewObj: results.rows[0] });
+    }
+  );
 });
 
-module.exports = { app, server };
+module.exports = app;
