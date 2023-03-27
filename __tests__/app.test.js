@@ -7,14 +7,13 @@ const {
   commentData,
 } = require("../db/data/test-data/index.js");
 const request = require("supertest");
-const { app, server } = require("../app.js");
+const app = require("../app.js");
 
 beforeEach(() => {
   return seed({ categoryData, reviewData, userData, commentData });
 });
 
 afterAll(() => {
-  server.close();
   return db.end();
 });
 
