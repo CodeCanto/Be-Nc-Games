@@ -115,10 +115,7 @@ describe("GET /api/reviews", () => {
             comment_count: expect.any(Number),
           });
           const { reviews } = body;
-          const sortedReviews = [...reviews].sort((reviewA, reviewB) => {
-            return reviewB.created_at - reviewA.created_at;
-          });
-          expect(reviews).toStrictEqual(sortedReviews);
+          expect(reviews).toBeSorted("created_at");
         });
       });
   });
@@ -141,10 +138,9 @@ describe("GET /api/reviews/:review_id/comments", () => {
             review_id: 2,
           });
           const { comments } = body;
-          const sortedComments = [...comments].sort((commentA, commentB) => {
-            return commentB.created_at - commentA.created_at;
+          expect(comments).toBeSorted("created_at", {
+            descending: true,
           });
-          expect(comments).toStrictEqual(sortedComments);
         });
       });
   });
@@ -170,6 +166,18 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.comments).toEqual([]);
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  it("201: should accept a request body with correct properties and respond with the posted comment", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ username: "bainesface", body: "Time to tickle." })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual("Time to tickle.");
       });
   });
 });

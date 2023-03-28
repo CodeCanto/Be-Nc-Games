@@ -43,11 +43,28 @@ exports.fetchReviewComments = (reviewId) => {
       ]);
     })
     .then((results) => {
-      let comments = results.rows;
+      const comments = results.rows;
       if (comments.length === 0) {
         return [];
       }
       return comments;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+exports.insertComment = (username, body, reviewId) => {
+  return db
+    .query(
+      `INSERT INTO comments (review_id, author, body)
+      VALUES ($1, $2, $3)
+      RETURNING *;
+      `,
+      [reviewId, username, body]
+    )
+    .then((results) => {
+      return results.rows[0];
     })
     .catch((err) => {
       throw err;
