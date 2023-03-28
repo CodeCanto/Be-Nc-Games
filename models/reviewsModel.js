@@ -30,3 +30,26 @@ exports.fetchReviews = () => {
       throw err;
     });
 };
+
+exports.fetchReviewComments = (reviewId) => {
+  return db
+    .query(`SELECT * FROM reviews WHERE review_id = $1`, [reviewId])
+    .then((results) => {
+      if (results.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return db.query(`SELECT * FROM comments WHERE review_id = $1`, [
+        reviewId,
+      ]);
+    })
+    .then((results) => {
+      let comments = results.rows;
+      if (comments.length === 0) {
+        return [];
+      }
+      return comments;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
