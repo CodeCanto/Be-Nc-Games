@@ -33,16 +33,21 @@ exports.fetchReviews = () => {
 
 exports.fetchReviewComments = (reviewId) => {
   return db
-    .query(
-      `SELECT comment_id, votes, created_at, author, body, review_id
-    FROM comments
-    WHERE review_id = $1
-    ORDER BY created_at DESC;
-    `,
-      [reviewId]
-    )
+    .query(`SELECT * FROM reviews WHERE review_id = $1`, [reviewId])
     .then((results) => {
-      return results.rows;
+      if (results.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return db.query(`SELECT * FROM comments WHERE review_id = $1`, [
+        reviewId,
+      ]);
+    })
+    .then((results) => {
+      let comments = results.rows;
+      if (comments.length === 0) {
+        return [];
+      }
+      return comments;
     })
     .catch((err) => {
       throw err;

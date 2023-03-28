@@ -127,7 +127,7 @@ describe("GET /api/reviews", () => {
 describe("GET /api/reviews/:review_id/comments", () => {
   it("200: should respond with an array of comments for the given review_id of which each comment has the correct properties in descending order of date.", () => {
     return request(app)
-      .get("/api/reviews/1/comments")
+      .get("/api/reviews/2/comments")
       .expect(200)
       .then(({ body }) => {
         const { comments } = body;
@@ -138,7 +138,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
             created_at: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
-            review_id: expect.any(Number),
+            review_id: 2,
           });
           const { comments } = body;
           const sortedComments = [...comments].sort((commentA, commentB) => {
@@ -146,6 +146,30 @@ describe("GET /api/reviews/:review_id/comments", () => {
           });
           expect(comments).toStrictEqual(sortedComments);
         });
+      });
+  });
+  it("400: should return bad request when endpoint has an invalid id.", () => {
+    return request(app)
+      .get("/api/reviews/monkey/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
+      });
+  });
+  it("404: should return a not found if given a valid id which does not exist.", () => {
+    return request(app)
+      .get("/api/reviews/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+  it("200: should return an empty array if a review exists but has no comments", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
       });
   });
 });
