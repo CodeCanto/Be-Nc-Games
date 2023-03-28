@@ -77,12 +77,20 @@ describe("GET /api/reviews/:review_id", () => {
         });
       });
   });
-  it("400: should return bad request when endpoint has an id which does not exist.", () => {
+  it("400: should return bad request when endpoint has an invalid id.", () => {
     return request(app)
       .get("/api/reviews/:monkey")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe(`Bad request`);
+      });
+  });
+  it("404: should return a not found if given a valid id which does not exist.", () => {
+    return request(app)
+      .get("/api/reviews/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
       });
   });
 });
