@@ -1,6 +1,12 @@
 const express = require("express");
 const app = express();
 const { getCategories } = require("./controllers/categoriesController");
+const { getReview } = require("./controllers/reviewsController");
+const {
+  handleCustomError,
+  handlePSQLError,
+  handleInternalError,
+} = require("./controllers/errorHandlerControllers");
 
 app.use(express.json());
 
@@ -10,8 +16,14 @@ app.get("/api", (req, res) => {
 
 app.get("/api/categories", getCategories);
 
-const server = app.listen("9090", () => {
-  console.log("Server is listening on port 9090");
+app.get("/api/reviews/:review_id", getReview);
+
+app.use(handleCustomError);
+app.use(handlePSQLError);
+app.use(handleInternalError);
+
+app.all("/*", (req, res) => {
+  res.status(404).send({ msg: "Path not found." });
 });
 
-module.exports = { app, server };
+module.exports = app;
