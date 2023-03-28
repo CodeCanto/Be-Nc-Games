@@ -13,3 +13,20 @@ exports.fetchReview = (reviewId) => {
       throw err;
     });
 };
+
+exports.fetchReviews = () => {
+  return db
+    .query(
+      `SELECT reviews.*, COUNT(comments.review_id)::int AS comment_count FROM reviews
+      LEFT JOIN comments ON reviews.review_id = comments.review_id
+      GROUP BY reviews.review_id
+      ORDER BY created_at DESC;
+      `
+    )
+    .then((results) => {
+      return results.rows;
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
