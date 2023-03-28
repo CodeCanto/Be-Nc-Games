@@ -123,3 +123,29 @@ describe("GET /api/reviews", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  it("200: should respond with an array of comments for the given review_id of which each comment has the correct properties in descending order of date.", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        comments.forEach((review) => {
+          expect(review).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: expect.any(Number),
+          });
+          const { comments } = body;
+          const sortedComments = [...comments].sort((commentA, commentB) => {
+            return commentB.created_at - commentA.created_at;
+          });
+          expect(comments).toStrictEqual(sortedComments);
+        });
+      });
+  });
+});
