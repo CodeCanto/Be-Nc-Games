@@ -94,3 +94,32 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
 });
+
+describe("GET /api/reviews", () => {
+  it("200: returns an array of review objects with the correct properties sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        reviews.forEach((review) => {
+          expect(review).toMatchObject({
+            owner: expect.any(String),
+            title: expect.any(String),
+            review_id: expect.any(Number),
+            category: expect.any(String),
+            review_img_url: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            designer: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+          const { reviews } = body;
+          const sortedReviews = [...reviews].sort((reviewA, reviewB) => {
+            return reviewB.created_at - reviewA.created_at;
+          });
+          expect(reviews).toStrictEqual(sortedReviews);
+        });
+      });
+  });
+});
