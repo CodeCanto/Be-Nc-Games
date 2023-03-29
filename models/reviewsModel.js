@@ -46,6 +46,10 @@ exports.fetchReviewComments = (reviewId) => {
 };
 
 exports.insertComment = (username, body, reviewId) => {
+  if (!username || !body) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
   return db
     .query(
       `INSERT INTO comments (review_id, author, body)

@@ -212,13 +212,13 @@ describe("POST /api/reviews/:review_id/comments", () => {
         expect(body.msg).toBe(`Bad request`);
       });
   });
-  it("404: should return Invalid key if necessary properties are missing.", () => {
+  it("400: should return Bad request if invalid input body.", () => {
     return request(app)
       .post("/api/reviews/1/comments")
-      .send({ username: "bainesface" })
-      .expect(404)
+      .send({ body: "bainesface" })
+      .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe(`Invalid key`);
+        expect(body.msg).toBe(`Bad request`);
       });
   });
 });
