@@ -222,3 +222,45 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+describe.only("PATCH: /api/reviews/:review_id ", () => {
+  it("200: should add to the votes at the review with the review id and return the updated review.", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          title: "Jenga",
+          designer: "Leslie Scott",
+          owner: "philippaclaire9",
+          review_id: 2,
+          review_img_url:
+            "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+          review_body: "Fiddly fun for all the family",
+          category: "dexterity",
+          created_at: "2021-01-18T10:01:41.251Z",
+          votes: 6,
+        });
+      });
+  });
+});
+
+/*
+
+Request body accepts:
+
+    an object in the form { inc_votes: newVote }
+
+    newVote will indicate how much the votes property in the database should be updated by
+    e.g.
+
+{ inc_votes : 1 } would increment the current review's vote property by 1
+
+{ inc_votes : -100} would decrement the current review's vote property by 100
+
+Responds with:
+
+    the updated review
+
+*/
