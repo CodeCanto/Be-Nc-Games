@@ -70,6 +70,10 @@ exports.insertComment = (username, body, reviewId) => {
 };
 
 exports.updateVote = (reviewId, inc_votes) => {
+  if (!Number.isInteger(inc_votes)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
   return db
     .query(
       `
@@ -80,8 +84,11 @@ exports.updateVote = (reviewId, inc_votes) => {
       `,
       [inc_votes, reviewId]
     )
-    .then((result) => {
-      console.log(result.rows[0]);
-      return result.rows[0];
+    .then((results) => {
+      if (results.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Invalid key" });
+      }
+
+      return results.rows[0];
     });
 };

@@ -54,7 +54,11 @@ exports.postComment = (req, res, next) => {
 exports.patchVote = (req, res, next) => {
   const reviewId = req.params.review_id;
   const { inc_votes } = req.body;
-  updateVote(reviewId, inc_votes).then((result) => {
-    res.status(200).send(result);
-  });
+  updateVote(reviewId, inc_votes)
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
