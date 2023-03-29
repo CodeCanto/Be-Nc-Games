@@ -8,9 +8,6 @@ exports.fetchReview = (reviewId) => {
         return Promise.reject({ status: 404, msg: "Not found" });
       }
       return results.rows[0];
-    })
-    .catch((err) => {
-      throw err;
     });
 };
 
@@ -25,9 +22,6 @@ exports.fetchReviews = () => {
     )
     .then((results) => {
       return results.rows;
-    })
-    .catch((err) => {
-      throw err;
     });
 };
 
@@ -43,13 +37,31 @@ exports.fetchReviewComments = (reviewId) => {
       ]);
     })
     .then((results) => {
-      let comments = results.rows;
+      const comments = results.rows;
       if (comments.length === 0) {
         return [];
       }
       return comments;
-    })
-    .catch((err) => {
-      throw err;
+    });
+};
+
+exports.insertComment = (username, body, reviewId) => {
+  if (!username || !body) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
+  return db
+    .query(
+      `INSERT INTO comments (review_id, author, body)
+      VALUES ($1, $2, $3)
+      RETURNING *;
+      `,
+      [reviewId, username, body]
+    )
+    .then((results) => {
+      if (results.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return results.rows[0];
     });
 };

@@ -115,10 +115,7 @@ describe("GET /api/reviews", () => {
             comment_count: expect.any(Number),
           });
           const { reviews } = body;
-          const sortedReviews = [...reviews].sort((reviewA, reviewB) => {
-            return reviewB.created_at - reviewA.created_at;
-          });
-          expect(reviews).toStrictEqual(sortedReviews);
+          expect(reviews).toBeSorted("created_at");
         });
       });
   });
@@ -141,10 +138,9 @@ describe("GET /api/reviews/:review_id/comments", () => {
             review_id: 2,
           });
           const { comments } = body;
-          const sortedComments = [...comments].sort((commentA, commentB) => {
-            return commentB.created_at - commentA.created_at;
+          expect(comments).toBeSorted("created_at", {
+            descending: true,
           });
-          expect(comments).toStrictEqual(sortedComments);
         });
       });
   });
@@ -170,6 +166,59 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.comments).toEqual([]);
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  it("201: should accept a request body with correct properties and respond with the posted comment", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ username: "bainesface", body: "Time to tickle." })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual("Time to tickle.");
+      });
+  });
+  it("201: should ignore unnecessary properties on the request body and respond with the posted comment", () => {
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send({
+        username: "mallionaire",
+        body: "Who wants to be a millionaire?",
+        animal: "Rhino",
+        Biscuits: "Bourbon",
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual("Who wants to be a millionaire?");
+      });
+  });
+  it("404: should return Invalid Key if given a valid id which does not exist.", () => {
+    return request(app)
+      .post("/api/reviews/999/comments")
+      .send({ username: "bainesface", body: "Time to tickle." })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid key");
+      });
+  });
+  it("400: should return Bad request when endpoint has an invalid id.", () => {
+    return request(app)
+      .post("/api/reviews/monkey/comments")
+      .send({ username: "bainesface", body: "Time to tickle." })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
+      });
+  });
+  it("400: should return Bad request if invalid input body.", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ body: "bainesface" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
       });
   });
 });
