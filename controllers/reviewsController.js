@@ -37,10 +37,14 @@ exports.getReviewComments = (req, res, next) => {
     });
 };
 
-exports.postComment = (req, res) => {
+exports.postComment = (req, res, next) => {
   const reviewId = req.params.review_id;
   const { username, body } = req.body;
-  insertComment(username, body, reviewId).then((commentObject) => {
-    res.status(201).send({ comment: commentObject.body });
-  });
+  insertComment(username, body, reviewId)
+    .then((commentObject) => {
+      res.status(201).send({ comment: commentObject.body });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
