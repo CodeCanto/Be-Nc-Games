@@ -222,3 +222,83 @@ describe("POST /api/reviews/:review_id/comments", () => {
       });
   });
 });
+
+describe("PATCH: /api/reviews/:review_id ", () => {
+  it("200: should add to the votes at the review with the review id and return the updated review.", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          title: "Jenga",
+          designer: "Leslie Scott",
+          owner: "philippaclaire9",
+          review_id: 2,
+          review_img_url:
+            "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+          review_body: "Fiddly fun for all the family",
+          category: "dexterity",
+          created_at: "2021-01-18T10:01:41.251Z",
+          votes: 6,
+        });
+      });
+  });
+  it("400: should return Bad request if invalid input body.", () => {
+    const request1 = request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_votes: "These votes were brought with bribes." })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
+      });
+
+    const request2 = request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_votes: 1.5 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
+      });
+
+    return Promise.all([request1, request2]);
+  });
+  it("404: should return Invalid key when endpoint has a valid id which does not exist.", () => {
+    return request(app)
+      .patch("/api/reviews/999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Invalid key`);
+      });
+  });
+  it("400: should return Bad request when endpoint has an invalid id.", () => {
+    return request(app)
+      .patch("/api/reviews/monkey")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
+      });
+  });
+  it("200: should ignore unnecessary properties on the request body and respond with the patched review object.", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_votes: 1, bad_vote: 2, monkey_vote: 4 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toEqual({
+          title: "Jenga",
+          designer: "Leslie Scott",
+          owner: "philippaclaire9",
+          review_id: 2,
+          review_img_url:
+            "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+          review_body: "Fiddly fun for all the family",
+          category: "dexterity",
+          created_at: "2021-01-18T10:01:41.251Z",
+          votes: 6,
+        });
+      });
+  });
+});
