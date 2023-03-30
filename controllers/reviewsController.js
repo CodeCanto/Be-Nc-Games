@@ -4,6 +4,7 @@ const {
   fetchReviewComments,
   insertComment,
   updateVote,
+  deleteComment,
 } = require("../models/reviewsModel");
 
 exports.getReview = (req, res, next) => {
@@ -57,6 +58,17 @@ exports.patchVote = (req, res, next) => {
   updateVote(reviewId, inc_votes)
     .then((result) => {
       res.status(200).send(result);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.removeComment = (req, res, next) => {
+  const commentId = req.params.comment_id;
+  deleteComment(commentId)
+    .then((result) => {
+      res.status(204).send(result);
     })
     .catch((err) => {
       next(err);
