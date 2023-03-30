@@ -8,6 +8,7 @@ const {
   postComment,
   patchVote,
   removeComment,
+  getUsers,
 } = require("./controllers/reviewsController");
 const {
   handleCustomError,
@@ -26,6 +27,8 @@ app.get("/api/categories", getCategories);
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReview);
 app.get("/api/reviews/:review_id/comments", getReviewComments);
+
+app.get("/api/users", getUsers);
 
 app.post("/api/reviews/:review_id/comments", postComment);
 

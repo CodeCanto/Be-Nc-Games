@@ -109,3 +109,9 @@ exports.deleteComment = (commentId) => {
       return results;
     });
 };
+
+exports.fetchUsers = () => {
+  return db.query(`SELECT * FROM users;`).then((results) => {
+    return results.rows;
+  });
+};
