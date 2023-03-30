@@ -303,7 +303,7 @@ describe("PATCH: /api/reviews/:review_id ", () => {
   });
 });
 
-describe.only("DELETE: /api/comments/:comment_id", () => {
+describe("DELETE: /api/comments/:comment_id", () => {
   it("204: should delete a comment at the specific id and respond with a 204 no content status.", () => {
     return request(app)
       .delete("/api/comments/1")
