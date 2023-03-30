@@ -302,3 +302,30 @@ describe("PATCH: /api/reviews/:review_id ", () => {
       });
   });
 });
+
+describe("DELETE: /api/comments/:comment_id", () => {
+  it("204: should delete a comment at the specific id and respond with a 204 no content status.", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+  it("404: should return Invalid key if passed valid id which does not exist.  ", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Invalid key`);
+      });
+  });
+  it("400: should return Bad Request if passed an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/monkey")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad request`);
+      });
+  });
+});
