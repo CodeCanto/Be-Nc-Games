@@ -30,5 +30,80 @@
         }
       ]
     }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves a specific review",
+    "queries": [1],
+    "exampleResponse": {
+      "reviews": {
+        "review_id": 1,
+        "title": "Agricola",
+        "review_body": "Farmyard fun!",
+        "designer": "Uwe Rosenberg",
+        "review_img_url": "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+        "votes": 1,
+        "category": "euro game",
+        "owner": "mallionaire",
+        "created_at": "2021-01-18T10:00:20.514Z",
+        "comment_count": "expect.any(Number)"
+      }
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "serves a array of comments for the specified review_id in descending order",
+    "queries": [1],
+    "exampleResponse": {
+      "reviews": {
+        "comment_id": "expect.any(Number)",
+        "votes": "expect.any(Number)",
+        "created_at": "expect.any(String)",
+        "author": "expect.any(String)",
+        "body": "expect.any(String)",
+        "review_id": "expect.any(Number)"
+      }
+    }
+  },
+  "PATCH: /api/reviews/:review_id": {
+    "description": "Adds to the votes at the specified review_id and returns the review object",
+    "queries": [1],
+    "exampleResponse": {
+      "title": "Jenga",
+      "designer": "Leslie Scott",
+      "owner": "philippaclaire9",
+      "review_id": 2,
+      "review_img_url": "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+      "review_body": "Fiddly fun for all the family",
+      "category": "dexterity",
+      "created_at": "2021-01-18T10:01:41.251Z",
+      "votes": 6
+    }
+  },
+  "DELETE: /api/comments/:comment_id": {
+    "description": "Deletes a comment at the specific id and responds with a 204 no content status.",
+    "queries": [1]
+  },
+  "GET: /api/users": {
+    "description": "Responds with an array of user objects.",
+    "queries": [],
+    "exampleResponse": {
+      "username": "expect.any(String)",
+      "name": "expect.any(String)",
+      "avatar_url": "expect.any(String)"
+    }
+  },
+  "GET: api/reviews (queries)": {
+    "description": "Returns all reviews with matching queries",
+    "queries": ["sort_by", "category", "order"],
+    "exampleResponse": {
+      "title": "Jenga",
+      "designer": "Leslie Scott",
+      "owner": "philippaclaire9",
+      "review_id": 2,
+      "review_img_url": "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+      "review_body": "Fiddly fun for all the family",
+      "category": "dexterity",
+      "created_at": "2021-01-18T10:01:41.251Z",
+      "votes": 5
+    }
   }
 }

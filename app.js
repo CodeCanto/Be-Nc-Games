@@ -19,7 +19,8 @@ const {
 app.use(express.json());
 
 app.get("/api", (req, res) => {
-  res.status(200).send({ message: "Server online." });
+  const manual = require("./endpoints.json");
+  res.status(200).send({ message: "Server online.", manual: manual });
 });
 
 app.get("/api/categories", getCategories);

@@ -37,6 +37,132 @@ describe("GET /api", () => {
         expect(response.body.message).toBe("Server online.");
       });
   });
+  it("should return a description of all endpoints on the API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        const { manual } = body;
+        expect(manual).toEqual({
+          "GET /api": {
+            description:
+              "serves up a json representation of all the available endpoints of the api",
+          },
+          "GET /api/categories": {
+            description: "serves an array of all categories",
+            queries: [],
+            exampleResponse: {
+              categories: [
+                {
+                  description:
+                    "Players attempt to uncover each other's hidden role",
+                  slug: "Social deduction",
+                },
+              ],
+            },
+          },
+          "GET /api/reviews": {
+            description: "serves an array of all reviews",
+            queries: ["category", "sort_by", "order"],
+            exampleResponse: {
+              reviews: [
+                {
+                  title: "One Night Ultimate Werewolf",
+                  designer: "Akihisa Okui",
+                  owner: "happyamy2016",
+                  review_img_url:
+                    "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+                  category: "hidden-roles",
+                  created_at: 1610964101251,
+                  votes: 5,
+                },
+              ],
+            },
+          },
+          "GET /api/reviews/:review_id": {
+            description: "serves a specific review",
+            queries: [1],
+            exampleResponse: {
+              reviews: {
+                review_id: 1,
+                title: "Agricola",
+                review_body: "Farmyard fun!",
+                designer: "Uwe Rosenberg",
+                review_img_url:
+                  "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700",
+                votes: 1,
+                category: "euro game",
+                owner: "mallionaire",
+                created_at: "2021-01-18T10:00:20.514Z",
+                comment_count: "expect.any(Number)",
+              },
+            },
+          },
+          "GET /api/reviews/:review_id/comments": {
+            description:
+              "serves a array of comments for the specified review_id in descending order",
+            queries: [1],
+            exampleResponse: {
+              reviews: {
+                comment_id: "expect.any(Number)",
+                votes: "expect.any(Number)",
+                created_at: "expect.any(String)",
+                author: "expect.any(String)",
+                body: "expect.any(String)",
+                review_id: "expect.any(Number)",
+              },
+            },
+          },
+          "PATCH: /api/reviews/:review_id": {
+            description:
+              "Adds to the votes at the specified review_id and returns the review object",
+            queries: [1],
+            exampleResponse: {
+              title: "Jenga",
+              designer: "Leslie Scott",
+              owner: "philippaclaire9",
+              review_id: 2,
+              review_img_url:
+                "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+              review_body: "Fiddly fun for all the family",
+              category: "dexterity",
+              created_at: "2021-01-18T10:01:41.251Z",
+              votes: 6,
+            },
+          },
+          "DELETE: /api/comments/:comment_id": {
+            description:
+              "Deletes a comment at the specific id and responds with a 204 no content status.",
+            queries: [1],
+          },
+          "GET: /api/users": {
+            description: "Responds with an array of user objects.",
+            queries: [],
+            exampleResponse: {
+              username: "expect.any(String)",
+              name: "expect.any(String)",
+              avatar_url: "expect.any(String)",
+            },
+          },
+          "GET: api/reviews (queries)": {
+            description: "Returns all reviews with matching queries",
+            queries: ["sort_by", "category", "order"],
+            exampleResponse: {
+              title: "Jenga",
+              designer: "Leslie Scott",
+              owner: "philippaclaire9",
+              review_id: 2,
+              review_img_url:
+                "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+              review_body: "Fiddly fun for all the family",
+              category: "dexterity",
+              created_at: "2021-01-18T10:01:41.251Z",
+              votes: 5,
+            },
+          },
+        });
+      });
+  });
 });
 
 describe("GET /api/categories", () => {
@@ -442,12 +568,3 @@ describe("GET: api/reviews (queries)", () => {
       });
   });
 });
-
-/**GET /api/reviews/:review_id (comment count)
- * 
- * FEATURE REQUEST
-A review response object should also now include:
-
--comment_count which is the total count of all the comments with this review_id - you should make use of queries to the database in order to achieve this.
-
- */
