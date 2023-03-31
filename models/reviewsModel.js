@@ -1,5 +1,6 @@
 const { query } = require("../db/connection");
 const db = require("../db/connection");
+const { sort } = require("../db/data/test-data/categories");
 
 exports.fetchReview = (reviewId) => {
   return db
@@ -12,19 +13,87 @@ exports.fetchReview = (reviewId) => {
     });
 };
 
-exports.fetchReviews = () => {
-  return db
+async function getValidSorts() {
+  const result = await db
     .query(
-      `
+      `SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'reviews'
+    `
+    )
+    .catch((err) => {
+      console.error("Error querying for valid sorts:", err);
+      throw err;
+    });
+  const { rows } = result;
+  return rows.map((row) => row.column_name);
+}
+
+async function getValidCategories() {
+  const result = await db.query(`SELECT slug FROM categories`).catch((err) => {
+    console.error("Error querying for valid categories:", err);
+    throw err;
+  });
+  const { rows } = result;
+  return rows.map((row) => row.slug);
+}
+
+exports.fetchReviews = async (query) => {
+  const validSorts = await getValidSorts();
+  const validCategories = await getValidCategories();
+
+  const options = {
+    sort_by: validSorts,
+    order: ["ASC", "DESC"],
+    category: validCategories,
+  };
+
+  const { category, sort_by = "created_at", order = "DESC" } = query;
+
+  const queryMethod = Object.keys(query).find((key) => key !== undefined);
+  const queryValue = Object.values(query).find((value) => value !== undefined);
+
+  if (queryMethod === undefined && queryValue === undefined) {
+    return db
+      .query(
+        `
       SELECT reviews.*, COUNT(comments.review_id)::int AS comment_count FROM reviews
       LEFT JOIN comments ON reviews.review_id = comments.review_id
       GROUP BY reviews.review_id
       ORDER BY created_at DESC;
       `
-    )
-    .then((results) => {
-      return results.rows;
+      )
+      .then((results) => {
+        return results.rows;
+      });
+  }
+
+  const validValues = options[queryMethod];
+
+  if (!validValues.includes(queryValue) && queryValue !== undefined) {
+    return Promise.reject({
+      status: 400,
+      msg: `${queryValue} is not a valid ${queryMethod} value.`,
     });
+  }
+
+  let queryString = "SELECT * FROM reviews";
+
+  if (category) {
+    queryString += ` WHERE category='${category}'`;
+  }
+
+  if (sort_by) {
+    queryString += ` ORDER BY ${sort_by}`;
+  }
+
+  if (order) {
+    queryString += ` ${order}`;
+  }
+
+  return db.query(queryString).then((results) => {
+    return results.rows;
+  });
 };
 
 exports.fetchReviewComments = (reviewId) => {
