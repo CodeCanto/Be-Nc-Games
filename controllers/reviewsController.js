@@ -20,7 +20,8 @@ exports.getReview = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  fetchReviews()
+  const query = req.query;
+  fetchReviews(query)
     .then((data) => {
       res.status(200).send({ reviews: data });
     })

@@ -330,14 +330,13 @@ describe("DELETE: /api/comments/:comment_id", () => {
   });
 });
 
-describe.only("GET: /api/users", () => {
+describe("GET: /api/users", () => {
   it("should respond with an array of user objects with the correct properties", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
         const { users } = body;
-        console.log(users);
         users.forEach((user) => {
           expect(user).toMatchObject({
             username: expect.any(String),
@@ -345,6 +344,100 @@ describe.only("GET: /api/users", () => {
             avatar_url: expect.any(String),
           });
         });
+      });
+  });
+});
+
+describe("GET: api/reviews (queries)", () => {
+  it("should return all reviews with matching queried category", () => {
+    return request(app)
+      .get("/api/reviews/?category=dexterity")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toEqual([
+          {
+            title: "Jenga",
+            designer: "Leslie Scott",
+            owner: "philippaclaire9",
+            review_id: 2,
+            review_img_url:
+              "https://images.pexels.com/photos/4473494/pexels-photo-4473494.jpeg?w=700&h=700",
+            review_body: "Fiddly fun for all the family",
+            category: "dexterity",
+            created_at: "2021-01-18T10:01:41.251Z",
+            votes: 5,
+          },
+        ]);
+      });
+  });
+  it("should sort correctly by input sort_by value", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=created_at")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSorted("created_at");
+      });
+  });
+  it("should sort correctly by input order value", () => {
+    return request(app)
+      .get("/api/reviews?order=ASC")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSorted(`ASC`);
+      });
+  });
+  it("should default to sort by created_at", () => {
+    return request(app)
+      .get("/api/reviews?category=social deduction")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSorted("created_at");
+      });
+  });
+  it("should default to desc", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=votes")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSorted("DESC");
+      });
+  });
+  it("400: rejects trying to sort by an invalid value", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=DROP")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`DROP is not a valid sort_by value.`);
+      });
+  });
+  it("400: rejects trying to order by an invalid value", () => {
+    return request(app)
+      .get("/api/reviews?order=MONKEY")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`MONKEY is not a valid order value.`);
+      });
+  });
+  it("404: should return if a category does not exist", () => {
+    return request(app)
+      .get("/api/reviews?category=DonutKing")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Sorry we can't find that category.`);
+      });
+  });
+  it("200: should return for valid category despite no reviews being associated with that category", () => {
+    return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toEqual([]);
       });
   });
 });
