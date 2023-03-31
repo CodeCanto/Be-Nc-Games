@@ -1,6 +1,7 @@
 const { query } = require("../db/connection");
 const db = require("../db/connection");
 const { sort } = require("../db/data/test-data/categories");
+const format = require("pg-format");
 
 exports.fetchReview = (reviewId) => {
   return db
@@ -79,7 +80,7 @@ exports.fetchReviews = async (query) => {
   let queryString = "SELECT * FROM reviews";
 
   if (category) {
-    queryString += ` WHERE category='${category}'`;
+    queryString += format(` WHERE category=%L`, category);
   }
 
   if (sort_by) {

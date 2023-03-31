@@ -433,7 +433,7 @@ describe("GET: api/reviews (queries)", () => {
   });
   it("200: should return for valid category despite no reviews being associated with that category", () => {
     return request(app)
-      .get("/api/reviews?category=children''s games")
+      .get("/api/reviews?category=children's games")
       .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
