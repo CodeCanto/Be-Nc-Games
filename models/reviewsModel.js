@@ -14,26 +14,18 @@ exports.fetchReview = (reviewId) => {
 };
 
 async function getValidSorts() {
-  const result = await db
-    .query(
-      `SELECT COLUMN_NAME
+  const result = await db.query(
+    `SELECT COLUMN_NAME
     FROM INFORMATION_SCHEMA.COLUMNS
     WHERE TABLE_NAME = 'reviews'
     `
-    )
-    .catch((err) => {
-      console.error("Error querying for valid sorts:", err);
-      throw err;
-    });
+  );
   const { rows } = result;
   return rows.map((row) => row.column_name);
 }
 
 async function getValidCategories() {
-  const result = await db.query(`SELECT slug FROM categories`).catch((err) => {
-    console.error("Error querying for valid categories:", err);
-    throw err;
-  });
+  const result = await db.query(`SELECT slug FROM categories`);
   const { rows } = result;
   return rows.map((row) => row.slug);
 }
@@ -69,6 +61,13 @@ exports.fetchReviews = async (query) => {
   }
 
   const validValues = options[queryMethod];
+
+  if (!options.category.includes(category) && category !== undefined) {
+    return Promise.reject({
+      status: 404,
+      msg: "Sorry we can't find that category.",
+    });
+  }
 
   if (!validValues.includes(queryValue) && queryValue !== undefined) {
     return Promise.reject({
@@ -181,6 +180,7 @@ exports.deleteComment = (commentId) => {
 
 exports.fetchUsers = () => {
   return db.query(`SELECT * FROM users;`).then((results) => {
+    console.log(results.rows);
     return results.rows;
   });
 };

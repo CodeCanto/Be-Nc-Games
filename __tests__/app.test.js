@@ -423,4 +423,21 @@ describe("GET: api/reviews (queries)", () => {
         expect(body.msg).toBe(`MONKEY is not a valid order value.`);
       });
   });
+  it("404: should return if a category does not exist", () => {
+    return request(app)
+      .get("/api/reviews?category=DonutKing")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Sorry we can't find that category.`);
+      });
+  });
+  it("200: should return for valid category despite no reviews being associated with that category", () => {
+    return request(app)
+      .get("/api/reviews?category=children''s games")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toEqual([]);
+      });
+  });
 });
