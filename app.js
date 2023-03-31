@@ -8,8 +8,8 @@ const {
   postComment,
   patchVote,
   removeComment,
-  getUsers,
 } = require("./controllers/reviewsController");
+const { getUsers } = require("./controllers/usersControllers");
 const {
   handleCustomError,
   handlePSQLError,
