@@ -62,8 +62,8 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/1")
       .expect(200)
       .then(({ body }) => {
-        const { reviewObj } = body;
-        expect(reviewObj).toMatchObject({
+        const { review } = body;
+        expect(review).toMatchObject({
           review_id: 1,
           title: "Agricola",
           review_body: "Farmyard fun!",
@@ -74,6 +74,7 @@ describe("GET /api/reviews/:review_id", () => {
           category: "euro game",
           owner: "mallionaire",
           created_at: "2021-01-18T10:00:20.514Z",
+          comment_count: expect.any(Number),
         });
       });
   });
@@ -441,3 +442,12 @@ describe("GET: api/reviews (queries)", () => {
       });
   });
 });
+
+/**GET /api/reviews/:review_id (comment count)
+ * 
+ * FEATURE REQUEST
+A review response object should also now include:
+
+-comment_count which is the total count of all the comments with this review_id - you should make use of queries to the database in order to achieve this.
+
+ */
