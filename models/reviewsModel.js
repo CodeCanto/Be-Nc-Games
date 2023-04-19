@@ -124,6 +124,7 @@ exports.fetchReviewComments = (reviewId) => {
 };
 
 exports.insertComment = (username, body, reviewId) => {
+  console.log(username, body, reviewId);
   if (!username || !body) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
@@ -138,9 +139,9 @@ exports.insertComment = (username, body, reviewId) => {
       [reviewId, username, body]
     )
     .then((results) => {
-      // if (results.rowCount === 0) {
-      //   return Promise.reject({ status: 404, msg: "Not found" });
-      // }
+      if (results.rowCount === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
       return results.rows[0];
     });
 };
