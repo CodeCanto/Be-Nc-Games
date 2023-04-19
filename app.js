@@ -32,7 +32,7 @@ app.get("/api/reviews/:review_id/comments", getReviewComments);
 
 app.get("/api/users", getUsers);
 
-app.post("/api/reviews/:review_id/comments", cors(), postComment);
+app.post("/api/reviews/:review_id/comments", postComment);
 
 app.patch("/api/reviews/:review_id", patchVote);
 
